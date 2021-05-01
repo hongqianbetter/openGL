@@ -6,6 +6,7 @@ import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
+import com.example.opengl.filter.CameraFilter;
 import com.example.opengl.filter.ScreenFilter;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -22,6 +23,7 @@ public class DouYinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
     int[] textures;
     SurfaceTexture surfaceTexture;
     ScreenFilter screenFilter;
+    CameraFilter cameraFilter;
 
     public DouYinRender(Context context, OpenGLView openGLView) {
         this.context = (Activity) context;
@@ -33,6 +35,7 @@ public class DouYinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
+        cameraFilter = new CameraFilter(context);
         //必须要再GL线程里面才能操作openGL
         screenFilter = new ScreenFilter(context);
 
@@ -53,6 +56,7 @@ public class DouYinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         cameraHelper.startPreview(surfaceTexture);
         screenFilter.onReady(width, height);
+        cameraFilter.onReady(width,height);
 
     }
 
@@ -75,9 +79,10 @@ public class DouYinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
         //       当从OpenGL ES的纹理对象取样时，首先应该调用getTransformMatrix()
         //       来转换纹理坐标。每次updateTexImage()被调用时，纹理矩阵都可能发生变化。所以，
         //       每次texture image被更新时，getTransformMatrix ()也应该被调用。
-        surfaceTexture.getTransformMatrix(mix);
-        //
-                screenFilter.onDrawFrame(textures[0], mix);
+
+        cameraFilter.setMatrix(mix);
+        int id=  cameraFilter.onDrawFrame(textures[0]);
+//    screenFilter.onDrawFrame(textures[0], mix);
 
     }
 

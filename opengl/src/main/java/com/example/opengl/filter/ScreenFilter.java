@@ -16,7 +16,7 @@ import java.nio.FloatBuffer;
  * Created by hongqian.better@outlook.com
  * on 2021/4/21
  */
-public class ScreenFilter {
+public class ScreenFilter extends AbstractFilter{
     private FloatBuffer mTextureBuffer;
     private FloatBuffer mVertexBuffer;
     private int vTexture;
@@ -28,98 +28,8 @@ public class ScreenFilter {
     private int mHeight;
 
     public ScreenFilter(Context context) {
-        //camera_vertex 中的内容读出字符串
-        String vertexSource = OpenUtil.readRawTextFile(context, R.raw.camera_vertex);
-        String fragSource = OpenUtil.readRawTextFile(context, R.raw.camera_frag);
-        L.detail(vertexSource);
+        super(context,R.raw.camera_vertex, R.raw.camera_frag);
 
-        //通过字符串(代码)创建着色器程序
-        //使用opengl
-        //1、创建顶点着色器
-        int vShaderId = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
-        // 1.2 绑定代码到着色器中去
-        GLES20.glShaderSource(vShaderId, vertexSource);
-        // 1.3 编译着色器代码
-        GLES20.glCompileShader(vShaderId);
-        //主动获取成功、失败 (如果不主动查询，只输出 一条 GLERROR之类的日志，很难定位到到底是那里出错)
-        int[] status = new int[1];
-        GLES20.glGetShaderiv(vShaderId, GLES20.GL_COMPILE_STATUS, status, 0);
-        if (status[0] != GLES20.GL_TRUE) {
-            throw new IllegalStateException("ScreenFilter 顶点着色器配置失败!");
-        }
-        //2、创建片元着色器
-        int fShaderId = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
-        GLES20.glShaderSource(fShaderId, fragSource);
-        GLES20.glCompileShader(fShaderId);
-        GLES20.glGetShaderiv(fShaderId, GLES20.GL_COMPILE_STATUS, status, 0);
-
-        if (status[0] != GLES20.GL_TRUE) {
-            throw new IllegalStateException("ScreenFilter 片元着色器配置失败!");
-        }
-        //3、创建着色器程序 (GPU上的小程序)
-        mProgram = GLES20.glCreateProgram();
-        //把着色器塞到程序当中
-        GLES20.glAttachShader(mProgram, vShaderId);
-        GLES20.glAttachShader(mProgram, fShaderId);
-
-        //链接着色器
-        GLES20.glLinkProgram(mProgram);
-
-        //获得程序是否配置成功
-        GLES20.glGetProgramiv(mProgram, GLES20.GL_LINK_STATUS, status, 0);
-        if (status[0] != GLES20.GL_TRUE) {
-            throw new IllegalStateException("ScreenFilter 着色器程序配置失败!");
-        }
-
-        //因为已经塞到着色器程序中了，所以删了没关系
-        GLES20.glDeleteShader(vShaderId);
-        GLES20.glDeleteShader(fShaderId);
-
-        //获得着色器程序中的变量的索引， 通过这个索引来给着色器中的变量赋值
-
-        vPosition = GLES20.glGetAttribLocation(mProgram, "vPosition");
-        vCoord = GLES20.glGetAttribLocation(mProgram, "vCoord");
-        vMatrix = GLES20.glGetUniformLocation(mProgram, "vMatrix");
-        //片元
-        vTexture = GLES20.glGetUniformLocation(mProgram, "vTexture");
-
-
-        //创建一个数据缓冲区
-        //4个点 每个点两个数据(x,y) 数据类型float
-        //顶点坐标                                 4个顶点 每个顶点点两个数据 数据类型float(Java占用4个字节)
-        //排序方式必须设置不必关心
-        mVertexBuffer = ByteBuffer.allocateDirect(4 * 2 * 4).order(ByteOrder.nativeOrder())
-                .asFloatBuffer();
-        mVertexBuffer.clear(); //先clean一下 初始化
-        float[] v = {-1.0f, -1.0f,
-                1.0f, -1.0f,
-                -1.0f, 1.0f,
-                1.0f, 1.0f};                         //右上    四个点可以构成一个完整矩形
-
-        //以上只是画矩形 跟采样无关
-        mVertexBuffer.put(v);
-
-
-        mTextureBuffer = ByteBuffer.allocateDirect(4 * 2 * 4).order(ByteOrder.nativeOrder())
-                .asFloatBuffer();
-        mTextureBuffer.clear();
-        //纹理世界坐标系
-        //                float[] t = { 0.0f, 1.0f,   左上
-        //                        1.0f, 1.0f,          右上
-        //                        0.0f, 0.0f,          左下
-        //                        1.0f, 0.0f};          右下
-        //旋转   180.c
-        //                float[] t = {1.0f, 0.0f,
-        //                        0.0f, 0.0f,
-        //                        1.0f, 1.0f,
-        //                        0.0f, 1.0f};
-        //镜像  翻转
-        float[] t = {0.0f, 0.0f,
-                1.0f, 0.0f,
-                0.0f, 1.0f,
-                1.0f, 1.0f
-        };
-        mTextureBuffer.put(t);
     }
 
 
