@@ -3,13 +3,16 @@ package com.example.opengl;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
+import android.hardware.Camera;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
 import com.example.opengl.filter.CameraFilter;
 import com.example.opengl.filter.ScreenFilter;
+import com.example.opengl.util.CameraHelper;
 
 import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL;
 import javax.microedition.khronos.opengles.GL10;
 
 /**
@@ -17,78 +20,101 @@ import javax.microedition.khronos.opengles.GL10;
  * on 2021/4/21
  */
 public class DouYinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvailableListener {
-    Activity context;
-    OpenGLView openGLView;
-    CameraHelper cameraHelper;
-    int[] textures;
-    SurfaceTexture surfaceTexture;
-    ScreenFilter screenFilter;
-    CameraFilter cameraFilter;
+    private ScreenFilter mScreenFilter;
+    private OpenGLView mView;
+    private CameraHelper mCameraHelper;
+    private SurfaceTexture mSurfaceTexture;
+    private float[] mtx = new float[16];
+    private int[] mTextures;
+    private CameraFilter mCameraFilter;
+    Context context;
 
-    public DouYinRender(Context context, OpenGLView openGLView) {
-        this.context = (Activity) context;
-        this.openGLView = openGLView;
-        this.openGLView.getContext().getResources();
+    public DouYinRender(Context context, OpenGLView douyinView) {
+        mView = douyinView;
+        this.context=context;
     }
 
-    //surface被创建后需要做的处理   //异步线程
+    /**
+     * 画布创建好啦
+     *
+     * @param gl
+     * @param config
+     */
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-
-        cameraFilter = new CameraFilter(context);
-        //必须要再GL线程里面才能操作openGL
-        screenFilter = new ScreenFilter(context);
-
-        cameraHelper = new CameraHelper(context);
+        //初始化的操作
+        mCameraHelper = new CameraHelper((Activity) context);
         //准备好摄像头绘制的画布
-        //通过openGL创建一个纹理id
-        textures = new int[1]; //可以一次创建多个纹理(画布) 创建纹理id  保存的数组  从数组的哪一个开始
-        GLES20.glGenTextures(textures.length, textures, 0);
-        surfaceTexture = new SurfaceTexture(textures[0]);
-        surfaceTexture.setOnFrameAvailableListener(this);
-
+        //通过opengl创建一个纹理id
+        mTextures = new int[1];
+        //偷懒 这里可以不配置 （当然 配置了也可以）
+        GLES20.glGenTextures(mTextures.length, mTextures, 0);
+        mSurfaceTexture = new SurfaceTexture(mTextures[0]);
+        //
+        mSurfaceTexture.setOnFrameAvailableListener(this);
+        //注意：必须在gl线程操作opengl
+        mCameraFilter = new CameraFilter(mView.getContext());
+        mScreenFilter = new ScreenFilter(mView.getContext());
     }
 
-    //openGL是一个高级画笔 将图像数据进行改变  再输出到屏幕显示
-
-    //异步线程  // 渲染窗口大小发生改变或者屏幕方法发生变化时候回调
+    /**
+     * 画布发生了改变
+     *
+     * @param gl
+     * @param width
+     * @param height
+     */
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        cameraHelper.startPreview(surfaceTexture);
-        screenFilter.onReady(width, height);
-        cameraFilter.onReady(width,height);
-
+        //开启预览
+        mCameraHelper.startPreview(mSurfaceTexture);
+        mCameraFilter.onReady(width,height);
+        mScreenFilter.onReady(width,height);
     }
 
-    float[] mix = new float[16];
-
-    //onFrameAvailable中的requestRender后走这里  //异步线程
+    /**
+     * 开始画画吧
+     *
+     * @param gl
+     */
     @Override
-    public void onDrawFrame(GL10 gl) { //绘制方法
-        //清理屏幕 ：glClearColor()-设置清空屏幕用的颜色，接收四个参数分别是：红色、绿色、蓝色和透明度分量，
-        // 0表示透明，1.0f相反；
-        GLES20.glClearColor(1, 0, 0, 0);   //Alpha 好像不起作用
-        //清空屏幕，清空屏幕后调用glClearColor(）中设置的颜色填充屏幕；
+    public void onDrawFrame(GL10 gl) {
+        // 配置屏幕
+        //清理屏幕 :告诉opengl 需要把屏幕清理成什么颜色
+        GLES20.glClearColor(0, 0, 0, 0);
+        //执行上一个：glClearColor配置的屏幕颜色
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-        //以上代码把底色置为了红色   同时注意window的颜色是黑色的
 
-        //先把摄像头的数据先输出来
-        //更新纹理 然后我们才能够使用OpenGL 从SurfaceTexture中获得数据进行渲染
-        surfaceTexture.updateTexImage();
+        // 把摄像头的数据先输出来
+        // 更新纹理，然后我们才能够使用opengl从SurfaceTexure当中获得数据 进行渲染
+        mSurfaceTexture.updateTexImage();
+        //surfaceTexture 比较特殊，在opengl当中 使用的是特殊的采样器 samplerExternalOES （不是sampler2D）
+        //获得变换矩阵
+        mSurfaceTexture.getTransformMatrix(mtx);
         //
-        //       当从OpenGL ES的纹理对象取样时，首先应该调用getTransformMatrix()
-        //       来转换纹理坐标。每次updateTexImage()被调用时，纹理矩阵都可能发生变化。所以，
-        //       每次texture image被更新时，getTransformMatrix ()也应该被调用。
-
-        cameraFilter.setMatrix(mix);
-        int id=  cameraFilter.onDrawFrame(textures[0]);
-//    screenFilter.onDrawFrame(textures[0], mix);
-
+        mCameraFilter.setMatrix(mtx);
+        //责任链
+        int id = mCameraFilter.onDrawFrame(mTextures[0]);
+        //加效果滤镜
+        // id  = 效果1.onDrawFrame(id);
+        // id = 效果2.onDrawFrame(id);
+        //....
+        //加完之后再显示到屏幕中去
+        mScreenFilter.onDrawFrame(id);
     }
 
-    //当SurfaceTexture有一个新的图片的时候回调 可能仅仅作用回调时机  省电
+    /**
+     * surfaceTexture 有一个有效的新数据的时候回调
+     *
+     * @param surfaceTexture
+     */
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
-        openGLView.requestRender();
+        mView.requestRender();
     }
+
+    public void onSurfaceDestroyed() {
+        mCameraHelper.stopPreview();
+    }
+
 }

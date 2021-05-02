@@ -1,4 +1,4 @@
-package com.example.opengl;
+package com.example.opengl.util;
 
 import android.content.Context;
 import android.opengl.GLES20;
@@ -8,12 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-/**
- * Created by hongqian.better@outlook.com
- * on 2021/3/2
- */
-public class OpenUtil {
-
+public class OpenGLUtils {
 
 
     /**
@@ -22,7 +17,7 @@ public class OpenUtil {
     public static void glGenTextures(int[] textures){
         //创建
         GLES20.glGenTextures(textures.length, textures, 0);
-        //配置纹理
+        //配置
         for (int i = 0; i < textures.length; i++) {
             // opengl的操作 面向过程的操作
             //bind 就是绑定 ，表示后续的操作就是在这一个 纹理上进行

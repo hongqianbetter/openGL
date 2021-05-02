@@ -3,17 +3,19 @@ package com.example.opengl.filter;
 import android.content.Context;
 import android.opengl.GLES20;
 
-import com.example.opengl.OpenUtil;
+
+import com.example.opengl.util.OpenGLUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 /**
- * Created by hongqian.better@outlook.com
- * on 2021/5/1
+ * @author Lance
+ * @date 2018/10/31
  */
 public abstract class AbstractFilter {
+
     protected FloatBuffer mGLVertexBuffer;
     protected FloatBuffer mGLTextureBuffer;
 
@@ -87,9 +89,9 @@ public abstract class AbstractFilter {
 
 
     protected void initilize(Context context) {
-        String vertexSharder = OpenUtil.readRawTextFile(context, mVertexShaderId);
-        String framentShader = OpenUtil.readRawTextFile(context, mFragmentShaderId);
-        mGLProgramId = OpenUtil.loadProgram(vertexSharder, framentShader);
+        String vertexSharder = OpenGLUtils.readRawTextFile(context, mVertexShaderId);
+        String framentShader = OpenGLUtils.readRawTextFile(context, mFragmentShaderId);
+        mGLProgramId = OpenGLUtils.loadProgram(vertexSharder, framentShader);
         // 获得着色器中的 attribute 变量 position 的索引值
         vPosition = GLES20.glGetAttribLocation(mGLProgramId, "vPosition");
         vCoord = GLES20.glGetAttribLocation(mGLProgramId,
@@ -142,5 +144,5 @@ public abstract class AbstractFilter {
     protected void initCoordinate() {
 
     }
-}
 
+}

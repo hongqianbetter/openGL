@@ -1,4 +1,4 @@
-package com.example.opengl;
+package com.example.opengl.util;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,6 +8,8 @@ import android.hardware.Camera;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
+
+import com.example.opengl.L;
 
 import java.util.Iterator;
 import java.util.List;
