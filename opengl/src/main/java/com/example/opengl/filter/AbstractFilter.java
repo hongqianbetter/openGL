@@ -69,11 +69,11 @@ public abstract class AbstractFilter {
         };
         mGLVertexBuffer.put(VERTEX);
 
-
         mGLTextureBuffer = ByteBuffer.allocateDirect(4 * 2 * 4)
                 .order(ByteOrder.nativeOrder())
                 .asFloatBuffer();
         mGLTextureBuffer.clear();
+        //更多决定采样方向
         float[] TEXTURE = {
                 0.0f, 1.0f,
                 1.0f, 1.0f,

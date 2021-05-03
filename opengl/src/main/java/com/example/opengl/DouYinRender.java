@@ -27,9 +27,9 @@ public class DouYinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
     private float[] mtx = new float[16];
     private int[] mTextures;
     private CameraFilter mCameraFilter;
-    Context context;
+    Activity context;
 
-    public DouYinRender(Context context, OpenGLView douyinView) {
+    public DouYinRender(Activity context, OpenGLView douyinView) {
         mView = douyinView;
         this.context=context;
     }
@@ -43,7 +43,7 @@ public class DouYinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         //初始化的操作
-        mCameraHelper = new CameraHelper((Activity) context);
+        mCameraHelper = new CameraHelper( context);
         //准备好摄像头绘制的画布
         //通过opengl创建一个纹理id
         mTextures = new int[1];

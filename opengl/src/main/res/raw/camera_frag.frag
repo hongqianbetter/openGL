@@ -12,7 +12,7 @@ uniform samplerExternalOES vTexture;
 
 void main(){
     //变量 接收像素值
-    // texture2D：采样器 采集 aCoord的像素
+    // texture2D：纹理采样函数 采集 aCoord的像素
     //赋值给 gl_FragColor 就可以了
     gl_FragColor = texture2D(vTexture,aCoord);
 //    gl_FragColor = vec4(1，0，0，0);

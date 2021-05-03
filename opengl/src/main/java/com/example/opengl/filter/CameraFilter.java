@@ -9,7 +9,7 @@ import com.example.opengl.util.OpenGLUtils;
 
 
 /**
- * 不需要显示到屏幕上
+ * 不需要显示到屏幕上  从SurfaceTexture中采集
  * 写入fbo (帧缓存)
  */
 public class CameraFilter extends AbstractFilter {
@@ -23,15 +23,16 @@ public class CameraFilter extends AbstractFilter {
         super(context, R.raw.camera_vertex, R.raw.camera_frag);
     }
 
+    //这一步转正
     @Override
     protected void initCoordinate() {
-        mGLTextureBuffer.clear();
-        //摄像头是颠倒的
+//        mGLTextureBuffer.clear();
+//        //摄像头是颠倒的
 //        float[] TEXTURE = {
+//                0.0f, 1.0f,
+//                1.0f, 1.0f,
 //                0.0f, 0.0f,
-////                1.0f, 0.0f,
-////                0.0f, 1.0f,
-////                1.0f, 1.0f
+//                1.0f, 0.0f
 //        };
         //调整好了镜像
 //        float[] TEXTURE = {
@@ -40,14 +41,14 @@ public class CameraFilter extends AbstractFilter {
 //                1.0f, 1.0f,
 //                0.0f, 1.0f,
 //        };
-        //修复旋转 逆时针旋转90度
-        float[] TEXTURE = {
-                0.0f, 0.0f,
-                0.0f, 1.0f,
-                1.0f, 0.0f,
-                1.0f, 1.0f,
-        };
-        mGLTextureBuffer.put(TEXTURE);
+        //修复旋转 逆时针旋转180度
+//        float[] TEXTURE = {
+//                0.0f, 0.0f,
+//                1.0f, 0.0f,
+//                0.0f, 1.0f,
+//                1.0f, 1.0f,
+//        };
+//        mGLTextureBuffer.put(TEXTURE);
     }
     public void destroyFrameBuffers() {
         //删除fbo的纹理

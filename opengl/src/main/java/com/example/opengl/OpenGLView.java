@@ -1,5 +1,6 @@
 package com.example.opengl;
 
+import android.app.Activity;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
@@ -23,7 +24,7 @@ public class OpenGLView extends GLSurfaceView {
     private void _init(Context context) {
         //设置EGL版本
         setEGLContextClientVersion(2);
-        setRenderer(new DouYinRender(context,this));
+        setRenderer(new DouYinRender((Activity) context,this));
 
 
         //设置按需渲染 当我们调用requestRender 请求GLThread 会掉一次 onDrawFrame

@@ -24,8 +24,6 @@ public class MyRender implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        //        screenFilter = new ScreenFilter();
-
         mTriangle = new Triangle();
     }
 
@@ -36,12 +34,10 @@ public class MyRender implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 gl) {
+        //配置清空屏幕的颜色
         GLES20.glClearColor(0, 0, 0, 0);   //Alpha 好像不起作用
         //清空屏幕，清空屏幕后调用glClearColor(）中设置的颜色填充屏幕；
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-//        screenFilter.draw();
         mTriangle.draw();
     }
-
-
 }
