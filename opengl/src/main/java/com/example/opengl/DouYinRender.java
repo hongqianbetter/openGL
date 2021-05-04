@@ -4,15 +4,24 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
+import android.opengl.EGL14;
+import android.opengl.EGLContext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.os.Build;
+import android.os.Environment;
+
+import androidx.annotation.RequiresApi;
 
 import com.example.opengl.filter.CameraFilter;
 import com.example.opengl.filter.ScreenFilter;
+import com.example.opengl.record.MediaRecorder;
 import com.example.opengl.util.CameraHelper;
 
+import java.io.File;
+import java.io.IOException;
+
 import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL;
 import javax.microedition.khronos.opengles.GL10;
 
 /**
@@ -28,7 +37,7 @@ public class DouYinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
     private int[] mTextures;
     private CameraFilter mCameraFilter;
     Activity context;
-
+    private MediaRecorder mMediaRecorder;
     public DouYinRender(Activity context, OpenGLView douyinView) {
         mView = douyinView;
         this.context=context;
@@ -40,6 +49,7 @@ public class DouYinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
      * @param gl
      * @param config
      */
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         //初始化的操作
@@ -55,6 +65,13 @@ public class DouYinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
         //注意：必须在gl线程操作opengl
         mCameraFilter = new CameraFilter(mView.getContext());
         mScreenFilter = new ScreenFilter(mView.getContext());
+
+        //渲染线程的EGL上下文
+        EGLContext eglContext = EGL14.eglGetCurrentContext();
+
+        String path = context.getCacheDir()+"/a.mp4";
+        L.detail(path);
+        mMediaRecorder = new MediaRecorder(mView.getContext(), path, CameraHelper.mHeight, CameraHelper.mWidth, eglContext);
     }
 
     /**
@@ -101,6 +118,8 @@ public class DouYinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
         //....
         //加完之后再显示到屏幕中去
         mScreenFilter.onDrawFrame(id);
+        //进行录制
+        mMediaRecorder.encodeFrame(id, mSurfaceTexture.getTimestamp());
     }
 
     /**
@@ -117,4 +136,16 @@ public class DouYinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
         mCameraHelper.stopPreview();
     }
 
+    public void startRecord(float speed) {
+        try {
+            mMediaRecorder.start(speed);
+        } catch (IOException e) {
+            e.printStackTrace();
+            L.detail(e.getMessage());
+        }
+    }
+
+    public void stopRecord() {
+        mMediaRecorder.stop();
+    }
 }

@@ -24,9 +24,10 @@ public class CameraHelper implements Camera.PreviewCallback {
     public Camera mCamera;
     //TV should 默认打开device 0
     private int mCameraID = Camera.CameraInfo.CAMERA_FACING_BACK;
-    int mWidth = 1920;
-    int mHeight = 1080;
-
+    public static int mWidth = 1920;
+    public static int mHeight = 1080;
+    //    int mWidth = 640;
+    //    int mHeight = 480;
     int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
 
     Activity mActivity;
@@ -46,13 +47,13 @@ public class CameraHelper implements Camera.PreviewCallback {
             //这是摄像头宽、高
             setPreviewSize(parameters);
             // 设置摄像头 图像传感器的角度、方向
-            setPreviewOrientation(parameters);
+            //            setPreviewOrientation(parameters);
             mCamera.setParameters(parameters);
             buffer = new byte[mWidth * mHeight * 3 / 2];
 
-//            //数据缓存区  为了给外部回调摄像头数据
-//            mCamera.addCallbackBuffer(buffer);
-//            mCamera.setPreviewCallbackWithBuffer(this);
+            //            //数据缓存区  为了给外部回调摄像头数据
+            //            mCamera.addCallbackBuffer(buffer);
+            //            mCamera.setPreviewCallbackWithBuffer(this);
 
             //设置预览画面
             mCamera.setPreviewTexture(texture);
@@ -133,17 +134,17 @@ public class CameraHelper implements Camera.PreviewCallback {
     }
 
 
-//    Camera.PreviewCallback mPreviewCallback;
-//
-//    public void setPreviewCallback(Camera.PreviewCallback previewCallback) {
-//        mPreviewCallback = previewCallback;
-//    }
-//
-//
+    //    Camera.PreviewCallback mPreviewCallback;
+    //
+    //    public void setPreviewCallback(Camera.PreviewCallback previewCallback) {
+    //        mPreviewCallback = previewCallback;
+    //    }
+    //
+    //
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
         // data数据依然是倒的
-//        mPreviewCallback.onPreviewFrame(data, camera);
-//        camera.addCallbackBuffer(buffer);
+        //        mPreviewCallback.onPreviewFrame(data, camera);
+        //        camera.addCallbackBuffer(buffer);
     }
 }
