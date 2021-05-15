@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
+import android.view.SurfaceHolder;
 
 /**
  * Created by hongqian.better@outlook.com
@@ -32,6 +33,12 @@ public class OpenGLView extends GLSurfaceView {
         setRenderMode(RENDERMODE_WHEN_DIRTY);
 
 
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        super.surfaceDestroyed(holder);
+        douYinRender.onSurfaceDestroyed();
     }
 
     //默认正常速度

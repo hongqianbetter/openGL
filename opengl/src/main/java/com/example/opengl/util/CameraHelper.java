@@ -23,12 +23,12 @@ public class CameraHelper implements Camera.PreviewCallback {
     private byte[] buffer;
     public Camera mCamera;
     //TV should 默认打开device 0
-    private int mCameraID = Camera.CameraInfo.CAMERA_FACING_BACK;
+//    private int mCameraID = Camera.CameraInfo.CAMERA_FACING_BACK;
     public static int mWidth = 1920;
     public static int mHeight = 1080;
     //    int mWidth = 640;
     //    int mHeight = 480;
-    int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+    public int mCameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
 
     Activity mActivity;
 
@@ -51,9 +51,9 @@ public class CameraHelper implements Camera.PreviewCallback {
             mCamera.setParameters(parameters);
             buffer = new byte[mWidth * mHeight * 3 / 2];
 
-            //            //数据缓存区  为了给外部回调摄像头数据
-            //            mCamera.addCallbackBuffer(buffer);
-            //            mCamera.setPreviewCallbackWithBuffer(this);
+            //数据缓存区  为了给外部回调摄像头数据
+            mCamera.addCallbackBuffer(buffer);
+            mCamera.setPreviewCallbackWithBuffer(this);
 
             //设置预览画面
             mCamera.setPreviewTexture(texture);
@@ -134,17 +134,20 @@ public class CameraHelper implements Camera.PreviewCallback {
     }
 
 
-    //    Camera.PreviewCallback mPreviewCallback;
-    //
-    //    public void setPreviewCallback(Camera.PreviewCallback previewCallback) {
-    //        mPreviewCallback = previewCallback;
-    //    }
-    //
-    //
+    Camera.PreviewCallback mPreviewCallback;
+
+    public void setPreviewCallback(Camera.PreviewCallback previewCallback) {
+        mPreviewCallback = previewCallback;
+    }
+
+
+
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
-        // data数据依然是倒的
-        //        mPreviewCallback.onPreviewFrame(data, camera);
-        //        camera.addCallbackBuffer(buffer);
+        if(mPreviewCallback!=null){
+            //data数据依然是倒的
+            mPreviewCallback.onPreviewFrame(data, camera);
+        }
+        camera.addCallbackBuffer(buffer);
     }
 }

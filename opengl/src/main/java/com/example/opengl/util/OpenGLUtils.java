@@ -1,9 +1,14 @@
 package com.example.opengl.util;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.opengl.GLES20;
+import android.os.Environment;
+import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -103,7 +108,7 @@ public class OpenGLUtils {
         GLES20.glGetShaderiv(fShader,GLES20.GL_COMPILE_STATUS,status,0);
         if(status[0] != GLES20.GL_TRUE){
             //失败
-            throw new IllegalStateException("load fragment shader:"+GLES20.glGetShaderInfoLog(vShader));
+            throw new IllegalStateException("load fragment shader:"+GLES20.glGetShaderInfoLog(vShader)+"-------");
         }
 
 
@@ -125,4 +130,13 @@ public class OpenGLUtils {
         GLES20.glDeleteShader(fShader);
         return program;
     }
+
+
+    public static File getExternalFileDir(Context context){
+        ContextWrapper cw = new ContextWrapper(context);
+        File directory = cw.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+        return directory;
+    }
+
+
 }

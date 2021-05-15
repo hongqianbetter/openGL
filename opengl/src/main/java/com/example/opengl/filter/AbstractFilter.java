@@ -4,6 +4,7 @@ import android.content.Context;
 import android.opengl.GLES20;
 
 
+import com.example.opengl.L;
 import com.example.opengl.util.OpenGLUtils;
 
 import java.nio.ByteBuffer;
@@ -91,6 +92,7 @@ public abstract class AbstractFilter {
     protected void initilize(Context context) {
         String vertexSharder = OpenGLUtils.readRawTextFile(context, mVertexShaderId);
         String framentShader = OpenGLUtils.readRawTextFile(context, mFragmentShaderId);
+        L.detail(framentShader);
         mGLProgramId = OpenGLUtils.loadProgram(vertexSharder, framentShader);
         // 获得着色器中的 attribute 变量 position 的索引值
         vPosition = GLES20.glGetAttribLocation(mGLProgramId, "vPosition");

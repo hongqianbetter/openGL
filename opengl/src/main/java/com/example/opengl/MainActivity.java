@@ -1,20 +1,11 @@
 package com.example.opengl;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-
 import android.Manifest;
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Environment;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.widget.RadioGroup;
-
 import com.example.opengl.widget.RecordButton;
-
-import java.io.File;
 
 public class MainActivity extends Activity {
 
